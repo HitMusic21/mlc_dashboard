@@ -1,0 +1,10 @@
+[flake8]
+max-line-length = 100
+
+# Black compatibility
+extend-ignore = E203, W503
+
+# Enforce imports at top of file (do not ignore E402)
+select = E,F,W,C90
+
+

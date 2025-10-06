@@ -1,0 +1,358 @@
+openapi: 3.1.0
+info:
+  title: BWARM Dashboard - Notifications API
+  version: 1.0.0
+  description: API endpoints for managing user notifications
+
+servers:
+  - url: http://localhost:8000/api/v1
+    description: Local development server
+
+paths:
+  /notifications:
+    get:
+      summary: Get user notifications
+      description: Retrieve paginated list of notifications for authenticated user
+      operationId: getNotifications
+      tags:
+        - Notifications
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+          description: Page number for pagination
+        - name: page_size
+          in: query
+          schema:
+            type: integer
+            minimum: 10
+            maximum: 100
+            default: 20
+          description: Number of items per page
+        - name: is_read
+          in: query
+          schema:
+            type: boolean
+          description: Filter by read status (omit for all notifications)
+        - name: type
+          in: query
+          schema:
+            type: string
+            enum:
+              - upload_complete
+              - upload_failed
+              - match_found
+              - system_alert
+              - info
+          description: Filter by notification type
+        - name: severity
+          in: query
+          schema:
+            type: string
+            enum:
+              - info
+              - success
+              - warning
+              - error
+          description: Filter by severity level
+      responses:
+        '200':
+          description: Notifications retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - data
+                  - pagination
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Notification'
+                  pagination:
+                    $ref: '#/components/schemas/PaginationInfo'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /notifications/unread-count:
+    get:
+      summary: Get unread notification count
+      description: Get the count of unread notifications for the authenticated user
+      operationId: getUnreadCount
+      tags:
+        - Notifications
+      responses:
+        '200':
+          description: Unread count retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - count
+                properties:
+                  count:
+                    type: integer
+                    minimum: 0
+                    example: 5
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /notifications/{notification_id}/read:
+    put:
+      summary: Mark notification as read
+      description: Mark a specific notification as read
+      operationId: markNotificationAsRead
+      tags:
+        - Notifications
+      parameters:
+        - name: notification_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: ID of the notification to mark as read
+      responses:
+        '200':
+          description: Notification marked as read
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Notification'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          description: Notification not found or does not belong to user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /notifications/read-all:
+    put:
+      summary: Mark all notifications as read
+      description: Mark all unread notifications as read for the authenticated user
+      operationId: markAllNotificationsAsRead
+      tags:
+        - Notifications
+      responses:
+        '200':
+          description: All notifications marked as read
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - updated_count
+                properties:
+                  updated_count:
+                    type: integer
+                    minimum: 0
+                    description: Number of notifications updated
+                    example: 12
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /notifications/{notification_id}:
+    delete:
+      summary: Delete notification
+      description: Delete a specific notification
+      operationId: deleteNotification
+      tags:
+        - Notifications
+      parameters:
+        - name: notification_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: ID of the notification to delete
+      responses:
+        '204':
+          description: Notification deleted successfully
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          description: Notification not found or does not belong to user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /notifications/clear-read:
+    delete:
+      summary: Clear all read notifications
+      description: Delete all read notifications for the authenticated user
+      operationId: clearReadNotifications
+      tags:
+        - Notifications
+      responses:
+        '200':
+          description: Read notifications cleared successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - deleted_count
+                properties:
+                  deleted_count:
+                    type: integer
+                    minimum: 0
+                    description: Number of notifications deleted
+                    example: 8
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+components:
+  schemas:
+    Notification:
+      type: object
+      required:
+        - id
+        - user_id
+        - type
+        - title
+        - message
+        - severity
+        - is_read
+        - is_dismissed
+        - created_at
+      properties:
+        id:
+          type: string
+          format: uuid
+        user_id:
+          type: string
+          format: uuid
+        type:
+          type: string
+          enum:
+            - upload_complete
+            - upload_failed
+            - match_found
+            - system_alert
+            - info
+          description: Notification type classification
+        title:
+          type: string
+          maxLength: 255
+          description: Notification headline
+          example: Catalog Upload Complete
+        message:
+          type: string
+          description: Notification body content
+          example: Your catalog "publisher_catalog_2024.csv" has been processed successfully. 4,523 tracks matched.
+        related_entity_type:
+          type: string
+          maxLength: 50
+          nullable: true
+          description: Type of related entity
+          example: catalog_upload
+        related_entity_id:
+          type: string
+          format: uuid
+          nullable: true
+          description: ID of related entity
+        severity:
+          type: string
+          enum:
+            - info
+            - success
+            - warning
+            - error
+          default: info
+          description: Severity level for visual styling
+        is_read:
+          type: boolean
+          default: false
+          description: Whether the notification has been read
+        is_dismissed:
+          type: boolean
+          default: false
+          description: Whether the notification has been dismissed
+        action_url:
+          type: string
+          maxLength: 500
+          nullable: true
+          description: URL for primary action (e.g., view upload results)
+          example: /uploads/123e4567-e89b-12d3-a456-426614174000
+        created_at:
+          type: string
+          format: date-time
+          description: When the notification was created
+        read_at:
+          type: string
+          format: date-time
+          nullable: true
+          description: When the notification was marked as read
+        expires_at:
+          type: string
+          format: date-time
+          nullable: true
+          description: When the notification will auto-expire
+
+    PaginationInfo:
+      type: object
+      required:
+        - page
+        - page_size
+        - total_items
+        - total_pages
+      properties:
+        page:
+          type: integer
+          minimum: 1
+          description: Current page number
+          example: 1
+        page_size:
+          type: integer
+          minimum: 1
+          description: Items per page
+          example: 20
+        total_items:
+          type: integer
+          minimum: 0
+          description: Total number of items across all pages
+          example: 47
+        total_pages:
+          type: integer
+          minimum: 0
+          description: Total number of pages
+          example: 3
+
+    ErrorResponse:
+      type: object
+      required:
+        - detail
+      properties:
+        detail:
+          type: string
+
+  responses:
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+security:
+  - BearerAuth: []

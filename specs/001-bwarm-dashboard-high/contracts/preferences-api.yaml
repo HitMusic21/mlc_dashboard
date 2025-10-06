@@ -1,0 +1,447 @@
+openapi: 3.1.0
+info:
+  title: BWARM Dashboard - User Preferences API
+  version: 1.0.0
+  description: API endpoints for managing user preferences and dashboard customization
+
+servers:
+  - url: http://localhost:8000/api/v1
+    description: Local development server
+
+paths:
+  /preferences:
+    get:
+      summary: Get current user preferences
+      description: Retrieve authenticated user's preference settings
+      operationId: getUserPreferences
+      tags:
+        - Preferences
+      responses:
+        '200':
+          description: User preferences retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/UserPreferences'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          description: Preferences not found (user has no preferences record yet)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    put:
+      summary: Update user preferences
+      description: Update authenticated user's preference settings (partial updates supported)
+      operationId: updateUserPreferences
+      tags:
+        - Preferences
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserPreferencesUpdate'
+      responses:
+        '200':
+          description: Preferences updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/UserPreferences'
+        '400':
+          description: Invalid request body or validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /preferences/layout:
+    post:
+      summary: Save dashboard layout
+      description: Save or update the user's dashboard widget layout configuration
+      operationId: saveDashboardLayout
+      tags:
+        - Preferences
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DashboardLayoutRequest'
+      responses:
+        '200':
+          description: Dashboard layout saved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/DashboardLayout'
+        '400':
+          description: Invalid layout configuration
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /preferences/searches:
+    post:
+      summary: Save a search
+      description: Save a new search/filter combination for quick access
+      operationId: saveSearch
+      tags:
+        - Preferences
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SavedSearchRequest'
+      responses:
+        '201':
+          description: Search saved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/SavedSearch'
+        '400':
+          description: Invalid search configuration
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /preferences/searches/{search_id}:
+    delete:
+      summary: Delete a saved search
+      description: Remove a saved search from user preferences
+      operationId: deleteSavedSearch
+      tags:
+        - Preferences
+      parameters:
+        - name: search_id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: ID of the saved search to delete
+      responses:
+        '204':
+          description: Search deleted successfully
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          description: Saved search not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  schemas:
+    UserPreferences:
+      type: object
+      required:
+        - id
+        - user_id
+        - theme
+        - items_per_page
+        - notification_email_enabled
+        - notification_browser_enabled
+        - language
+        - timezone
+        - created_at
+        - updated_at
+      properties:
+        id:
+          type: string
+          format: uuid
+        user_id:
+          type: string
+          format: uuid
+        dashboard_layout:
+          $ref: '#/components/schemas/DashboardLayout'
+        saved_searches:
+          type: array
+          items:
+            $ref: '#/components/schemas/SavedSearch'
+          description: Array of saved search/filter combinations
+        theme:
+          type: string
+          enum:
+            - light
+            - dark
+            - auto
+          default: light
+        items_per_page:
+          type: integer
+          minimum: 10
+          maximum: 200
+          default: 50
+          description: Number of items to display per page in tables
+        notification_email_enabled:
+          type: boolean
+          default: true
+          description: Enable email notifications
+        notification_browser_enabled:
+          type: boolean
+          default: true
+          description: Enable browser push notifications
+        language:
+          type: string
+          minLength: 2
+          maxLength: 10
+          default: en
+          description: ISO 639-1 language code
+          example: en
+        timezone:
+          type: string
+          maxLength: 50
+          default: UTC
+          description: IANA timezone identifier
+          example: America/New_York
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    UserPreferencesUpdate:
+      type: object
+      properties:
+        dashboard_layout:
+          $ref: '#/components/schemas/DashboardLayout'
+        theme:
+          type: string
+          enum:
+            - light
+            - dark
+            - auto
+        items_per_page:
+          type: integer
+          minimum: 10
+          maximum: 200
+        notification_email_enabled:
+          type: boolean
+        notification_browser_enabled:
+          type: boolean
+        language:
+          type: string
+          minLength: 2
+          maxLength: 10
+        timezone:
+          type: string
+          maxLength: 50
+
+    DashboardLayout:
+      type: object
+      required:
+        - widgets
+      properties:
+        widgets:
+          type: array
+          items:
+            type: object
+            required:
+              - id
+              - position
+            properties:
+              id:
+                type: string
+                description: Widget identifier
+                example: upload-stats
+              position:
+                type: object
+                required:
+                  - x
+                  - y
+                  - w
+                  - h
+                properties:
+                  x:
+                    type: integer
+                    minimum: 0
+                    description: Column position (grid units)
+                  y:
+                    type: integer
+                    minimum: 0
+                    description: Row position (grid units)
+                  w:
+                    type: integer
+                    minimum: 1
+                    description: Width in grid units
+                  h:
+                    type: integer
+                    minimum: 1
+                    description: Height in grid units
+      example:
+        widgets:
+          - id: upload-stats
+            position:
+              x: 0
+              y: 0
+              w: 6
+              h: 4
+          - id: recent-matches
+            position:
+              x: 6
+              y: 0
+              w: 6
+              h: 4
+
+    DashboardLayoutRequest:
+      type: object
+      required:
+        - widgets
+      properties:
+        widgets:
+          type: array
+          items:
+            type: object
+            required:
+              - id
+              - position
+            properties:
+              id:
+                type: string
+              position:
+                type: object
+                required:
+                  - x
+                  - y
+                  - w
+                  - h
+                properties:
+                  x:
+                    type: integer
+                    minimum: 0
+                  y:
+                    type: integer
+                    minimum: 0
+                  w:
+                    type: integer
+                    minimum: 1
+                  h:
+                    type: integer
+                    minimum: 1
+
+    SavedSearch:
+      type: object
+      required:
+        - id
+        - name
+        - filters
+        - created_at
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the saved search
+          example: search-1
+        name:
+          type: string
+          maxLength: 100
+          description: User-provided name for the search
+          example: Disputed Rights Works
+        filters:
+          type: object
+          description: Filter configuration (structure depends on search context)
+          additionalProperties: true
+          example:
+            has_disputed_right_shares: true
+            created_at_from: "2024-01-01"
+        created_at:
+          type: string
+          format: date-time
+          description: When the search was saved
+
+    SavedSearchRequest:
+      type: object
+      required:
+        - name
+        - filters
+      properties:
+        name:
+          type: string
+          maxLength: 100
+          minLength: 1
+          description: User-provided name for the search
+        filters:
+          type: object
+          description: Filter configuration to save
+          additionalProperties: true
+
+    ErrorResponse:
+      type: object
+      required:
+        - detail
+      properties:
+        detail:
+          type: string
+
+    ValidationErrorResponse:
+      type: object
+      required:
+        - detail
+      properties:
+        detail:
+          oneOf:
+            - type: string
+            - type: array
+              items:
+                type: object
+                properties:
+                  loc:
+                    type: array
+                    items:
+                      oneOf:
+                        - type: string
+                        - type: integer
+                  msg:
+                    type: string
+                  type:
+                    type: string
+
+  responses:
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+security:
+  - BearerAuth: []

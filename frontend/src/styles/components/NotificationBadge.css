@@ -1,0 +1,155 @@
+/**
+ * NotificationBadge Component Styles
+ *
+ * Styles for the notification count badge with variants and animations.
+ */
+
+.notification-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 var(--spacing-1);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  line-height: 1;
+  border-radius: var(--radius-full);
+  white-space: nowrap;
+  user-select: none;
+}
+
+/* ===== Variants ===== */
+
+.notification-badge--default {
+  background-color: var(--color-error-500);
+  color: white;
+}
+
+.notification-badge--error {
+  background-color: var(--color-error-600);
+  color: white;
+}
+
+.notification-badge--warning {
+  background-color: var(--color-warning-500);
+  color: white;
+}
+
+/* ===== Pulse Animation ===== */
+
+.notification-badge--pulse {
+  animation: badge-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  position: relative;
+}
+
+.notification-badge--pulse::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: var(--radius-full);
+  background-color: currentColor;
+  opacity: 0.3;
+  animation: badge-pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes badge-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+@keyframes badge-pulse-ring {
+  0% {
+    transform: scale(1);
+    opacity: 0.3;
+  }
+  50% {
+    transform: scale(1.3);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0;
+  }
+}
+
+/* ===== Positioning Variants (for parent containers) ===== */
+
+/* When badge is positioned on an icon/button */
+.notification-badge-container {
+  position: relative;
+  display: inline-flex;
+}
+
+.notification-badge-container .notification-badge {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  box-shadow: 0 0 0 2px var(--bg-primary);
+}
+
+/* ===== Size Variants ===== */
+
+.notification-badge--sm {
+  min-width: 16px;
+  height: 16px;
+  font-size: 10px;
+  padding: 0 4px;
+}
+
+.notification-badge--lg {
+  min-width: 24px;
+  height: 24px;
+  font-size: var(--font-size-sm);
+  padding: 0 var(--spacing-2);
+}
+
+/* ===== Dark Mode Adjustments ===== */
+
+[data-theme="dark"] .notification-badge--default {
+  background-color: var(--color-error-600);
+}
+
+[data-theme="dark"] .notification-badge--error {
+  background-color: var(--color-error-700);
+}
+
+[data-theme="dark"] .notification-badge--warning {
+  background-color: var(--color-warning-600);
+}
+
+/* ===== Accessibility ===== */
+
+@media (prefers-reduced-motion: reduce) {
+  .notification-badge--pulse,
+  .notification-badge--pulse::before {
+    animation: none;
+  }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+  .notification-badge {
+    border: 2px solid currentColor;
+  }
+}
+
+/* ===== Responsive Design ===== */
+
+@media (max-width: 640px) {
+  .notification-badge {
+    min-width: 18px;
+    height: 18px;
+    font-size: 10px;
+  }
+
+  .notification-badge-container .notification-badge {
+    top: -4px;
+    right: -4px;
+  }
+}

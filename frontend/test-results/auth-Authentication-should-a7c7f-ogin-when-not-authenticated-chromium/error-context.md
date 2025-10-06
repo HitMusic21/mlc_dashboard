@@ -1,0 +1,87 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e3]:
+  - link "Skip to main content" [ref=e4] [cursor=pointer]:
+    - /url: "#main-content"
+  - banner [ref=e5]:
+    - generic [ref=e6]:
+      - link "THE INCURABLE HUMANIST" [ref=e7] [cursor=pointer]:
+        - /url: /
+      - navigation [ref=e8]:
+        - link "ABOUT" [ref=e9] [cursor=pointer]:
+          - /url: /about
+        - link "NEWSLETTER" [ref=e10] [cursor=pointer]:
+          - /url: /newsletter
+        - link "PRESS" [ref=e11] [cursor=pointer]:
+          - /url: /press
+        - link "CONTACT" [ref=e12] [cursor=pointer]:
+          - /url: /contact
+  - main [ref=e13]:
+    - generic [ref=e15]:
+      - img "Denise Rodriguez Dao, author of The Incurable Humanist, in burgundy blouse with books creating an intimate literary atmosphere" [ref=e18]
+      - generic [ref=e25]:
+        - heading "The Incurable Humanist" [level=1] [ref=e27]:
+          - generic [ref=e28]: The Incurable
+          - generic [ref=e29]: Humanist
+        - generic [ref=e30]: By Denise Rodriguez Dao
+        - paragraph [ref=e32]: Exploring grief, migration, and art
+        - link "Subscribe to Newsletter" [ref=e34] [cursor=pointer]:
+          - /url: /newsletter
+        - generic [ref=e35]:
+          - generic [ref=e36]: Connect
+          - generic [ref=e37]:
+            - link "Instagram" [ref=e38] [cursor=pointer]:
+              - /url: https://www.instagram.com/theincurablehumanist/
+              - img [ref=e39] [cursor=pointer]
+            - link "TikTok" [ref=e41] [cursor=pointer]:
+              - /url: https://www.tiktok.com/@theincurablehumanist
+              - img [ref=e42] [cursor=pointer]
+            - link "Facebook" [ref=e44] [cursor=pointer]:
+              - /url: https://www.facebook.com/profile.php?id=61581842306462
+              - img [ref=e45] [cursor=pointer]
+            - link "LinkedIn" [ref=e47] [cursor=pointer]:
+              - /url: https://www.linkedin.com/company/the-incurable-humanist/about/
+              - img [ref=e48] [cursor=pointer]
+            - link "X (Twitter)" [ref=e50] [cursor=pointer]:
+              - /url: https://x.com/TheIncurableHum
+              - img [ref=e51] [cursor=pointer]
+  - contentinfo [ref=e53]:
+    - generic [ref=e54]:
+      - generic [ref=e55]:
+        - generic [ref=e56]:
+          - generic [ref=e57]: The Incurable Humanist
+          - paragraph [ref=e58]: Exploring grief, migration, and art
+        - generic [ref=e59]:
+          - generic [ref=e60]: Navigate
+          - navigation [ref=e61]:
+            - link "ABOUT" [ref=e62] [cursor=pointer]:
+              - /url: /about
+            - link "NEWSLETTER" [ref=e63] [cursor=pointer]:
+              - /url: /newsletter
+            - link "PRESS" [ref=e64] [cursor=pointer]:
+              - /url: /press
+            - link "CONTACT" [ref=e65] [cursor=pointer]:
+              - /url: /contact
+        - generic [ref=e66]:
+          - generic [ref=e67]: Connect
+          - generic [ref=e68]:
+            - link "Instagram" [ref=e69] [cursor=pointer]:
+              - /url: https://www.instagram.com/theincurablehumanist/
+              - img [ref=e70] [cursor=pointer]
+            - link "TikTok" [ref=e72] [cursor=pointer]:
+              - /url: https://www.tiktok.com/@theincurablehumanist
+              - img [ref=e73] [cursor=pointer]
+            - link "Facebook" [ref=e75] [cursor=pointer]:
+              - /url: https://www.facebook.com/profile.php?id=61581842306462
+              - img [ref=e76] [cursor=pointer]
+            - link "LinkedIn" [ref=e78] [cursor=pointer]:
+              - /url: https://www.linkedin.com/company/the-incurable-humanist/about/
+              - img [ref=e79] [cursor=pointer]
+            - link "X (Twitter)" [ref=e81] [cursor=pointer]:
+              - /url: https://x.com/TheIncurableHum
+              - img [ref=e82] [cursor=pointer]
+          - link "Subscribe to Newsletter →" [ref=e84] [cursor=pointer]:
+            - /url: /newsletter
+      - paragraph [ref=e86]: © 2025 Denise Rodriguez Dao. All rights reserved.
+```

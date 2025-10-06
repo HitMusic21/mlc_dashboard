@@ -1,0 +1,39 @@
+{
+  "name": "BWARM Dashboard",
+  "short_name": "BWARM",
+  "description": "Music copyright administration dashboard for BWARM",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#2563eb",
+  "orientation": "any",
+  "icons": [],
+  "categories": ["business", "productivity", "music"],
+  "shortcuts": [
+    {
+      "name": "Dashboard",
+      "short_name": "Home",
+      "description": "Go to dashboard",
+      "url": "/"
+    },
+    {
+      "name": "Browse Works",
+      "short_name": "Works",
+      "description": "Browse musical works",
+      "url": "/works"
+    },
+    {
+      "name": "Catalog Matcher",
+      "short_name": "Catalog",
+      "description": "Match catalog files",
+      "url": "/catalog"
+    },
+    {
+      "name": "Notifications",
+      "short_name": "Notifications",
+      "description": "View notifications",
+      "url": "/notifications"
+    }
+  ],
+  "screenshots": []
+}

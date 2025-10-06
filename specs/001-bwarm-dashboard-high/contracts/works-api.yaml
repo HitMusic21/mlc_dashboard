@@ -1,0 +1,411 @@
+openapi: 3.1.0
+info:
+  title: BWARM Dashboard - Works API
+  version: 1.0.0
+  description: API endpoints for browsing and searching musical works and resources
+
+servers:
+  - url: http://localhost:8000/api/v1
+    description: Local development server
+
+paths:
+  /works:
+    get:
+      summary: List musical works
+      description: Retrieve paginated list of musical works with optional filtering and search
+      operationId: listWorks
+      tags:
+        - Works
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 50
+        - name: search
+          in: query
+          description: Full-text search on title and catalog numbers
+          schema:
+            type: string
+        - name: has_iswc
+          in: query
+          description: Filter by ISWC presence
+          schema:
+            type: boolean
+        - name: has_disputed_rights
+          in: query
+          description: Filter by disputed rights status
+          schema:
+            type: boolean
+        - name: created_after
+          in: query
+          description: Filter by creation date (ISO 8601)
+          schema:
+            type: string
+            format: date-time
+        - name: created_before
+          in: query
+          description: Filter by creation date (ISO 8601)
+          schema:
+            type: string
+            format: date-time
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - data
+                  - pagination
+                  - meta
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/MusicalWork'
+                  pagination:
+                    $ref: '#/components/schemas/Pagination'
+                  filters_applied:
+                    type: object
+                    additionalProperties: true
+                  meta:
+                    $ref: '#/components/schemas/ResponseMeta'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /works/{id}:
+    get:
+      summary: Get musical work by ID
+      description: Retrieve detailed information about a specific musical work
+      operationId: getWork
+      tags:
+        - Works
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/MusicalWorkDetailed'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /works/search:
+    post:
+      summary: Advanced search for works
+      description: Elasticsearch-powered advanced search with complex queries
+      operationId: searchWorks
+      tags:
+        - Works
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WorkSearchRequest'
+      responses:
+        '200':
+          description: Search results
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - data
+                  - pagination
+                  - meta
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/MusicalWorkSearchResult'
+                  pagination:
+                    $ref: '#/components/schemas/Pagination'
+                  meta:
+                    allOf:
+                      - $ref: '#/components/schemas/ResponseMeta'
+                      - type: object
+                        properties:
+                          search_time_ms:
+                            type: integer
+
+  /works/statistics:
+    get:
+      summary: Get dashboard statistics
+      description: Retrieve aggregated statistics for dashboard display
+      operationId: getStatistics
+      tags:
+        - Works
+      responses:
+        '200':
+          description: Statistics data
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/DashboardStatistics'
+
+components:
+  schemas:
+    MusicalWork:
+      type: object
+      required:
+        - id
+        - musical_work_record_id
+        - title
+        - has_disputed_right_shares
+        - is_arrangement_traditional_work
+        - created_at
+      properties:
+        id:
+          type: string
+          format: uuid
+        musical_work_record_id:
+          type: string
+        iswc:
+          type: string
+          nullable: true
+          pattern: '^T-\d{3}\.\d{3}\.\d{3}-\d$'
+        title:
+          type: string
+        title_language_script_code:
+          type: string
+          nullable: true
+        opus_number:
+          type: string
+          nullable: true
+        catalogue_number:
+          type: array
+          items:
+            type: string
+          nullable: true
+        duration:
+          type: string
+          format: duration
+          nullable: true
+        has_disputed_right_shares:
+          type: boolean
+        public_domain_territory_codes:
+          type: array
+          items:
+            type: string
+            pattern: '^[A-Z]{2}$'
+          nullable: true
+        is_arrangement_traditional_work:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+
+    MusicalWorkDetailed:
+      allOf:
+        - $ref: '#/components/schemas/MusicalWork'
+        - type: object
+          properties:
+            resources:
+              type: array
+              items:
+                $ref: '#/components/schemas/Resource'
+
+    Resource:
+      type: object
+      required:
+        - id
+        - resource_record_id
+        - resource_type
+        - title
+        - display_artist_name
+        - created_at
+      properties:
+        id:
+          type: string
+          format: uuid
+        resource_record_id:
+          type: string
+        resource_type:
+          type: string
+          enum:
+            - SoundRecording
+            - MusicVideo
+        isrc:
+          type: string
+          nullable: true
+          pattern: '^[A-Z]{2}-[A-Z0-9]{3}-\d{2}-\d{5}$'
+        title:
+          type: string
+        display_artist_name:
+          type: string
+        duration:
+          type: string
+          format: duration
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+
+    MusicalWorkSearchResult:
+      allOf:
+        - $ref: '#/components/schemas/MusicalWork'
+        - type: object
+          properties:
+            search_score:
+              type: number
+              format: float
+
+    WorkSearchRequest:
+      type: object
+      properties:
+        query:
+          type: string
+        filters:
+          type: object
+          properties:
+            has_iswc:
+              type: boolean
+            has_disputed_rights:
+              type: boolean
+            created_after:
+              type: string
+              format: date-time
+            created_before:
+              type: string
+              format: date-time
+        page:
+          type: integer
+          minimum: 1
+          default: 1
+        limit:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 50
+
+    DashboardStatistics:
+      type: object
+      required:
+        - total_works
+        - works_with_iswc
+        - disputed_works
+        - monthly_trend
+      properties:
+        total_works:
+          type: integer
+        works_with_iswc:
+          type: integer
+        disputed_works:
+          type: integer
+        monthly_trend:
+          type: array
+          items:
+            type: object
+            required:
+              - month
+              - count
+            properties:
+              month:
+                type: string
+                format: date
+              count:
+                type: integer
+
+    Pagination:
+      type: object
+      required:
+        - page
+        - limit
+        - total
+        - pages
+      properties:
+        page:
+          type: integer
+        limit:
+          type: integer
+        total:
+          type: integer
+        pages:
+          type: integer
+
+    ResponseMeta:
+      type: object
+      required:
+        - response_time_ms
+      properties:
+        response_time_ms:
+          type: integer
+        cache_hit:
+          type: boolean
+
+    ErrorResponse:
+      type: object
+      required:
+        - detail
+      properties:
+        detail:
+          type: string
+
+  responses:
+    BadRequest:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    InternalServerError:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+security:
+  - BearerAuth: []

@@ -1,0 +1,524 @@
+openapi: 3.1.0
+info:
+  title: BWARM Dashboard - Catalog API
+  version: 1.0.0
+  description: API endpoints for catalog upload, matching, and results
+
+servers:
+  - url: http://localhost:8000/api/v1
+    description: Local development server
+
+paths:
+  /catalog/upload:
+    post:
+      summary: Upload catalog file
+      description: Upload a publisher catalog for matching (CSV, Excel, JSON, or XML)
+      operationId: uploadCatalog
+      tags:
+        - Catalog
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - file
+                - publisher_name
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: Catalog file (max 500MB)
+                publisher_name:
+                  type: string
+                  description: Publisher business name
+      responses:
+        '201':
+          description: Upload accepted and processing started
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/CatalogUpload'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '413':
+          description: File too large
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /catalog/uploads:
+    get:
+      summary: List user's catalog uploads
+      description: Retrieve list of all uploads for the authenticated user
+      operationId: listUploads
+      tags:
+        - Catalog
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+        - name: status
+          in: query
+          description: Filter by processing status
+          schema:
+            type: string
+            enum:
+              - uploading
+              - processing
+              - completed
+              - failed
+      responses:
+        '200':
+          description: List of uploads
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - data
+                  - pagination
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/CatalogUpload'
+                  pagination:
+                    $ref: '#/components/schemas/Pagination'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /catalog/{id}/status:
+    get:
+      summary: Get upload processing status
+      description: Check the current status and progress of a catalog upload
+      operationId: getUploadStatus
+      tags:
+        - Catalog
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Upload status
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/CatalogUploadStatus'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /catalog/{id}/results:
+    get:
+      summary: Get matching results
+      description: Retrieve all match results for a completed catalog upload
+      operationId: getMatchResults
+      tags:
+        - Catalog
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: page
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 50
+        - name: confidence
+          in: query
+          description: Filter by confidence level
+          schema:
+            type: string
+            enum:
+              - high
+              - medium
+              - low
+        - name: min_score
+          in: query
+          description: Minimum match score (0.0-1.0)
+          schema:
+            type: number
+            format: float
+            minimum: 0.0
+            maximum: 1.0
+      responses:
+        '200':
+          description: Match results
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - data
+                  - pagination
+                  - meta
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/MatchResultGroup'
+                  pagination:
+                    $ref: '#/components/schemas/Pagination'
+                  meta:
+                    $ref: '#/components/schemas/ResponseMeta'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /catalog/{id}/export:
+    get:
+      summary: Export match results
+      description: Export matching results to CSV or Excel format
+      operationId: exportResults
+      tags:
+        - Catalog
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: format
+          in: query
+          required: true
+          schema:
+            type: string
+            enum:
+              - csv
+              - excel
+        - name: confidence
+          in: query
+          description: Filter by confidence level
+          schema:
+            type: string
+            enum:
+              - high
+              - medium
+              - low
+      responses:
+        '200':
+          description: Exported file
+          content:
+            text/csv:
+              schema:
+                type: string
+                format: binary
+            application/vnd.openxmlformats-officedocument.spreadsheetml.sheet:
+              schema:
+                type: string
+                format: binary
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /catalog/{id}:
+    delete:
+      summary: Delete catalog upload
+      description: Delete a catalog upload and all associated match results
+      operationId: deleteUpload
+      tags:
+        - Catalog
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Successfully deleted
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+components:
+  schemas:
+    CatalogUpload:
+      type: object
+      required:
+        - id
+        - user_id
+        - publisher_name
+        - upload_filename
+        - file_format
+        - file_size
+        - status
+        - total_tracks
+        - processed_tracks
+        - matched_tracks
+        - upload_date
+      properties:
+        id:
+          type: string
+          format: uuid
+        user_id:
+          type: string
+          format: uuid
+        publisher_name:
+          type: string
+        upload_filename:
+          type: string
+        file_format:
+          type: string
+          enum:
+            - csv
+            - excel
+            - json
+            - xml
+        file_size:
+          type: integer
+          format: int64
+        status:
+          type: string
+          enum:
+            - uploading
+            - processing
+            - completed
+            - failed
+        total_tracks:
+          type: integer
+        processed_tracks:
+          type: integer
+        matched_tracks:
+          type: integer
+        upload_date:
+          type: string
+          format: date-time
+        processing_started_at:
+          type: string
+          format: date-time
+          nullable: true
+        processing_completed_at:
+          type: string
+          format: date-time
+          nullable: true
+
+    CatalogUploadStatus:
+      allOf:
+        - $ref: '#/components/schemas/CatalogUpload'
+        - type: object
+          properties:
+            progress_percentage:
+              type: number
+              format: float
+              minimum: 0
+              maximum: 100
+            estimated_time_remaining_seconds:
+              type: integer
+              nullable: true
+            error_message:
+              type: string
+              nullable: true
+
+    MatchResultGroup:
+      type: object
+      required:
+        - uploaded_track
+        - matches
+      properties:
+        uploaded_track:
+          $ref: '#/components/schemas/UploadedTrack'
+        matches:
+          type: array
+          items:
+            $ref: '#/components/schemas/CatalogMatch'
+          description: All matches for this track, sorted by score (highest first)
+
+    UploadedTrack:
+      type: object
+      required:
+        - title
+      properties:
+        title:
+          type: string
+        artist:
+          type: string
+          nullable: true
+        iswc:
+          type: string
+          nullable: true
+        duration:
+          type: string
+          format: duration
+          nullable: true
+
+    CatalogMatch:
+      type: object
+      required:
+        - id
+        - matched_work
+        - match_score
+        - confidence_level
+        - matching_algorithm
+        - rank
+      properties:
+        id:
+          type: string
+          format: uuid
+        matched_work:
+          $ref: '#/components/schemas/MusicalWork'
+        match_score:
+          type: number
+          format: float
+          minimum: 0.0
+          maximum: 1.0
+        confidence_level:
+          type: string
+          enum:
+            - high
+            - medium
+            - low
+        matching_algorithm:
+          type: string
+        rank:
+          type: integer
+          minimum: 1
+          description: Rank within all matches for this uploaded track (1 = best match)
+        created_at:
+          type: string
+          format: date-time
+
+    MusicalWork:
+      type: object
+      required:
+        - id
+        - title
+      properties:
+        id:
+          type: string
+          format: uuid
+        musical_work_record_id:
+          type: string
+        iswc:
+          type: string
+          nullable: true
+        title:
+          type: string
+        opus_number:
+          type: string
+          nullable: true
+        catalogue_number:
+          type: array
+          items:
+            type: string
+          nullable: true
+        duration:
+          type: string
+          format: duration
+          nullable: true
+
+    Pagination:
+      type: object
+      required:
+        - page
+        - limit
+        - total
+        - pages
+      properties:
+        page:
+          type: integer
+        limit:
+          type: integer
+        total:
+          type: integer
+        pages:
+          type: integer
+
+    ResponseMeta:
+      type: object
+      required:
+        - response_time_ms
+      properties:
+        response_time_ms:
+          type: integer
+        cache_hit:
+          type: boolean
+
+    ErrorResponse:
+      type: object
+      required:
+        - detail
+      properties:
+        detail:
+          type: string
+
+  responses:
+    BadRequest:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Forbidden:
+      description: Forbidden - user does not own this resource
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+security:
+  - BearerAuth: []

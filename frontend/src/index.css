@@ -1,0 +1,386 @@
+/* Import custom design system */
+@import './styles/tokens.css';
+@import './styles/global.css';
+@import './styles/typography.css';
+@import './styles/layout.css';
+@import './styles/components.css';
+@import './styles/mobile.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    line-height: 1.5;
+    font-weight: 400;
+
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    margin: 0;
+    min-width: 320px;
+    min-height: 100vh;
+    @apply bg-secondary-50 text-secondary-900;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+}
+
+@layer components {
+  /* App Layout */
+  .app-loading {
+    @apply flex items-center justify-center min-h-screen bg-secondary-50;
+  }
+
+  .loading-spinner {
+    @apply flex flex-col items-center gap-4;
+  }
+
+  .spinner-icon {
+    @apply text-primary-600 animate-spin;
+  }
+
+  .page-loading {
+    @apply flex items-center justify-center min-h-[50vh] text-secondary-500;
+  }
+
+  /* Header Styles */
+  .app-header {
+    @apply bg-white border-b border-secondary-200 sticky top-0 z-50 shadow-sm;
+  }
+
+  .header-content {
+    @apply max-w-[1920px] mx-auto px-6 py-4 flex items-center justify-between gap-6;
+  }
+
+  .header-brand {
+    @apply flex items-center gap-3;
+  }
+
+  .brand-logo {
+    @apply text-primary-600 w-8 h-8;
+  }
+
+  .brand-title {
+    @apply text-xl font-semibold text-secondary-900 m-0;
+  }
+
+  .header-nav {
+    @apply hidden md:flex items-center gap-1;
+  }
+
+  .header-nav .nav-link {
+    @apply px-4 py-2 rounded-lg text-sm font-medium text-secondary-700
+           hover:bg-secondary-100 hover:text-secondary-900
+           transition-colors duration-150;
+  }
+
+  .header-nav .nav-link.active {
+    @apply bg-primary-50 text-primary-700 font-semibold;
+  }
+
+  .header-user {
+    @apply relative;
+  }
+
+  .user-button {
+    @apply flex items-center gap-3 px-3 py-2 rounded-lg
+           hover:bg-secondary-100 transition-colors duration-150
+           border-none bg-transparent cursor-pointer;
+  }
+
+  .user-avatar {
+    @apply w-9 h-9 rounded-full bg-primary-600 text-white
+           flex items-center justify-center text-sm font-semibold;
+  }
+
+  .user-info {
+    @apply hidden md:flex flex-col items-start;
+  }
+
+  .user-name {
+    @apply text-sm font-medium text-secondary-900;
+  }
+
+  .user-role {
+    @apply text-xs text-secondary-500 capitalize;
+  }
+
+  .dropdown-icon {
+    @apply text-secondary-500 transition-transform duration-200;
+  }
+
+  .dropdown-icon.open {
+    @apply rotate-180;
+  }
+
+  .user-dropdown {
+    @apply absolute right-0 top-full mt-2 w-64
+           bg-white rounded-lg shadow-lg border border-secondary-200
+           py-2 z-50;
+  }
+
+  .dropdown-section {
+    @apply px-3 py-2;
+  }
+
+  .dropdown-header {
+    @apply px-2 py-1;
+  }
+
+  .dropdown-email {
+    @apply text-sm text-secondary-600 truncate m-0;
+  }
+
+  .dropdown-divider {
+    @apply border-t border-secondary-200 my-2;
+  }
+
+  .dropdown-item {
+    @apply w-full flex items-center gap-3 px-3 py-2 rounded-md
+           text-sm text-secondary-700 hover:bg-secondary-100
+           transition-colors duration-150 border-none bg-transparent
+           cursor-pointer text-left;
+  }
+
+  .dropdown-item svg {
+    @apply text-secondary-500;
+  }
+
+  /* Sidebar Styles */
+  .sidebar {
+    @apply bg-white border-r border-secondary-200
+           flex flex-col transition-all duration-300
+           fixed md:static top-0 left-0 h-screen z-40;
+  }
+
+  .sidebar.open {
+    @apply w-64;
+  }
+
+  .sidebar.closed {
+    @apply w-0 md:w-16;
+  }
+
+  .sidebar-toggle {
+    @apply p-3 hover:bg-secondary-100 transition-colors
+           border-none bg-transparent cursor-pointer;
+  }
+
+  .sidebar-nav {
+    @apply flex-1 py-4 overflow-y-auto;
+  }
+
+  .nav-list {
+    @apply list-none p-0 m-0 flex flex-col gap-1 px-3;
+  }
+
+  .nav-item {
+    @apply flex items-center gap-3 px-4 py-3 rounded-lg
+           text-secondary-700 hover:bg-secondary-100
+           transition-colors duration-150 no-underline;
+  }
+
+  .nav-item.active {
+    @apply bg-primary-50 text-primary-700 font-semibold;
+  }
+
+  .nav-icon {
+    @apply flex-shrink-0 w-5 h-5;
+  }
+
+  .nav-label {
+    @apply text-sm font-medium;
+  }
+
+  .sidebar.closed .nav-label {
+    @apply hidden md:hidden;
+  }
+
+  .sidebar-collapse {
+    @apply p-3 border-t border-secondary-200 hover:bg-secondary-100
+           transition-colors border-none bg-transparent cursor-pointer;
+  }
+
+  /* Layout */
+  .layout-container {
+    @apply flex h-screen overflow-hidden;
+  }
+
+  .layout-main {
+    @apply flex-1 flex flex-col overflow-hidden;
+  }
+
+  .layout-content {
+    @apply flex-1 overflow-y-auto p-6;
+  }
+
+  /* Common Utilities */
+  .mobile-only {
+    @apply md:hidden;
+  }
+
+  .desktop-only {
+    @apply hidden md:block;
+  }
+
+  /* Not Found Page */
+  .not-found-page {
+    @apply flex flex-col items-center justify-center min-h-screen
+           text-center px-4;
+  }
+
+  .not-found-page h1 {
+    @apply text-4xl font-bold text-secondary-900 mb-4;
+  }
+
+  .not-found-page p {
+    @apply text-lg text-secondary-600 mb-6;
+  }
+
+  .not-found-page a {
+    @apply inline-block px-6 py-3 bg-primary-600 text-white
+           rounded-lg font-medium hover:bg-primary-700
+           transition-colors duration-150 no-underline;
+  }
+
+  /* Login Page */
+  .login-page {
+    @apply min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-50 to-secondary-100 px-4;
+  }
+
+  .login-container {
+    @apply w-full max-w-md bg-white rounded-2xl shadow-xl p-8;
+  }
+
+  .login-header {
+    @apply text-center mb-8;
+  }
+
+  .login-logo {
+    @apply mx-auto mb-4 text-primary-600;
+  }
+
+  .login-title {
+    @apply text-2xl font-bold text-secondary-900 mb-2 m-0;
+  }
+
+  .login-subtitle {
+    @apply text-secondary-600 m-0;
+  }
+
+  .login-form {
+    @apply flex flex-col gap-5;
+  }
+
+  .login-error {
+    @apply flex items-start gap-3 p-4 bg-error-50 border border-error-200
+           rounded-lg text-error-800;
+  }
+
+  .error-icon {
+    @apply flex-shrink-0 text-error-600;
+  }
+
+  .login-input-group {
+    @apply flex flex-col gap-2;
+  }
+
+  .login-label {
+    @apply text-sm font-medium text-secondary-700;
+  }
+
+  .login-input {
+    @apply px-4 py-2.5 border border-secondary-300 rounded-lg
+           focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent
+           transition-all duration-150;
+  }
+
+  .login-input:hover {
+    @apply border-secondary-400;
+  }
+
+  .login-button {
+    @apply w-full px-4 py-2.5 bg-primary-600 text-white rounded-lg
+           font-medium hover:bg-primary-700 focus:outline-none focus:ring-2
+           focus:ring-primary-500 focus:ring-offset-2 transition-all duration-150
+           disabled:opacity-50 disabled:cursor-not-allowed
+           border-none cursor-pointer;
+  }
+
+  .login-button:disabled {
+    @apply hover:bg-primary-600;
+  }
+
+  /* Error Boundary */
+  .error-boundary {
+    @apply flex items-center justify-center min-h-screen bg-secondary-50 p-4;
+  }
+
+  .error-content {
+    @apply text-center max-w-md;
+  }
+
+  .error-content .error-icon {
+    @apply mx-auto mb-4 text-error-500;
+  }
+
+  .error-title {
+    @apply text-2xl font-bold text-secondary-900 mb-2;
+  }
+
+  .error-message {
+    @apply text-secondary-600 mb-6;
+  }
+
+  .error-button {
+    @apply px-6 py-3 bg-primary-600 text-white rounded-lg font-medium
+           hover:bg-primary-700 transition-colors duration-150
+           border-none cursor-pointer;
+  }
+
+  /* Loading Fallback */
+  .loading-fallback {
+    @apply flex items-center justify-center min-h-[50vh];
+  }
+
+  .loading-text {
+    @apply text-secondary-600 mt-3 m-0;
+  }
+
+  /* Mobile Navigation */
+  @media (max-width: 768px) {
+    .header-nav {
+      @apply hidden;
+    }
+
+    .sidebar.open {
+      @apply translate-x-0;
+    }
+
+    .sidebar.closed {
+      @apply -translate-x-full;
+    }
+
+    /* Mobile overlay when sidebar is open */
+    .sidebar.open::before {
+      content: '';
+      @apply fixed inset-0 bg-black bg-opacity-50 -z-10;
+    }
+  }
+
+  /* Responsive Tables */
+  @media (max-width: 640px) {
+    .table-responsive {
+      @apply overflow-x-auto;
+    }
+  }
+}

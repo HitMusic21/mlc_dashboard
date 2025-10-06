@@ -47,7 +47,38 @@
 ## Constitution Check
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
-[Gates determined based on constitution file]
+### I. Clean and Modular Code
+- [ ] Components/services have single responsibility (files <300 lines)
+- [ ] No circular dependencies between modules
+- [ ] Clear separation of concerns (models, services, API, UI)
+
+### II. FastAPI Best Practices (Backend)
+- [ ] Async/await used for I/O operations
+- [ ] Pydantic models for request/response validation
+- [ ] Dependency injection for shared resources
+- [ ] APIRouter for endpoint grouping
+- [ ] Proper error handling with HTTPException
+
+### III. React Best Practices (Frontend)
+- [ ] Functional components with hooks (no class components)
+- [ ] TypeScript with strict mode
+- [ ] Components <200 lines with clear responsibility
+- [ ] Accessibility standards followed (WCAG 2.1 AA)
+- [ ] Proper error boundaries and loading states
+
+### IV. Test-First Development (NON-NEGOTIABLE)
+- [ ] Tests written BEFORE implementation
+- [ ] Contract tests for API schemas
+- [ ] Integration tests for user flows
+- [ ] Target: 80% code coverage minimum
+
+### V. Type Safety and Validation
+- [ ] Pydantic models for all API boundaries (backend)
+- [ ] TypeScript strict mode, no unjustified `any` (frontend)
+- [ ] Runtime validation at system boundaries
+- [ ] Database migrations with Alembic
+
+**Violations**: If any checks fail, document in Complexity Tracking table with justification
 
 ## Project Structure
 
@@ -216,4 +247,4 @@ directories captured above]
 - [ ] Complexity deviations documented
 
 ---
-*Based on Constitution v2.1.1 - See `/memory/constitution.md`*
+*Based on Constitution v1.0.0 - See `.specify/memory/constitution.md`*

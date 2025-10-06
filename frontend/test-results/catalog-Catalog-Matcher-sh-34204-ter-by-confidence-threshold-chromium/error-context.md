@@ -1,0 +1,68 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e3]:
+  - link "Skip to main content" [ref=e4] [cursor=pointer]:
+    - /url: "#main-content"
+  - banner [ref=e5]:
+    - generic [ref=e6]:
+      - link "THE INCURABLE HUMANIST" [ref=e7] [cursor=pointer]:
+        - /url: /
+      - navigation [ref=e8]:
+        - link "ABOUT" [ref=e9] [cursor=pointer]:
+          - /url: /about
+        - link "NEWSLETTER" [ref=e10] [cursor=pointer]:
+          - /url: /newsletter
+        - link "PRESS" [ref=e11] [cursor=pointer]:
+          - /url: /press
+        - link "CONTACT" [ref=e12] [cursor=pointer]:
+          - /url: /contact
+  - main [ref=e13]:
+    - generic [ref=e15]:
+      - heading "404" [level=1] [ref=e16]
+      - heading "Page Not Found" [level=2] [ref=e17]
+      - paragraph [ref=e18]: The page you're looking for doesn't exist or has been moved.
+      - generic [ref=e21]:
+        - link "Go Home" [ref=e22] [cursor=pointer]:
+          - /url: /
+        - link "Learn More" [ref=e23] [cursor=pointer]:
+          - /url: /about
+  - contentinfo [ref=e24]:
+    - generic [ref=e25]:
+      - generic [ref=e26]:
+        - generic [ref=e27]:
+          - generic [ref=e28]: The Incurable Humanist
+          - paragraph [ref=e29]: Exploring grief, migration, and art
+        - generic [ref=e30]:
+          - generic [ref=e31]: Navigate
+          - navigation [ref=e32]:
+            - link "ABOUT" [ref=e33] [cursor=pointer]:
+              - /url: /about
+            - link "NEWSLETTER" [ref=e34] [cursor=pointer]:
+              - /url: /newsletter
+            - link "PRESS" [ref=e35] [cursor=pointer]:
+              - /url: /press
+            - link "CONTACT" [ref=e36] [cursor=pointer]:
+              - /url: /contact
+        - generic [ref=e37]:
+          - generic [ref=e38]: Connect
+          - generic [ref=e39]:
+            - link "Instagram" [ref=e40] [cursor=pointer]:
+              - /url: https://www.instagram.com/theincurablehumanist/
+              - img [ref=e41] [cursor=pointer]
+            - link "TikTok" [ref=e43] [cursor=pointer]:
+              - /url: https://www.tiktok.com/@theincurablehumanist
+              - img [ref=e44] [cursor=pointer]
+            - link "Facebook" [ref=e46] [cursor=pointer]:
+              - /url: https://www.facebook.com/profile.php?id=61581842306462
+              - img [ref=e47] [cursor=pointer]
+            - link "LinkedIn" [ref=e49] [cursor=pointer]:
+              - /url: https://www.linkedin.com/company/the-incurable-humanist/about/
+              - img [ref=e50] [cursor=pointer]
+            - link "X (Twitter)" [ref=e52] [cursor=pointer]:
+              - /url: https://x.com/TheIncurableHum
+              - img [ref=e53] [cursor=pointer]
+          - link "Subscribe to Newsletter →" [ref=e55] [cursor=pointer]:
+            - /url: /newsletter
+      - paragraph [ref=e57]: © 2025 Denise Rodriguez Dao. All rights reserved.
+```

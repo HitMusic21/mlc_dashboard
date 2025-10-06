@@ -1,0 +1,246 @@
+/**
+ * DualChartPanel Component Styles
+ *
+ * Styles for the dual chart display panel with tabs, responsive layout,
+ * and state variations (loading, error, empty).
+ */
+
+.dual-chart-panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-6);
+  background-color: var(--bg-primary);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-6);
+  box-shadow: var(--shadow-sm);
+}
+
+/* ===== Header ===== */
+
+.dual-chart-panel__header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4);
+}
+
+@media (min-width: 768px) {
+  .dual-chart-panel__header {
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-between;
+  }
+}
+
+.dual-chart-panel__header-content {
+  flex: 1;
+}
+
+.dual-chart-panel__title {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-1);
+}
+
+.dual-chart-panel__description {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  line-height: var(--line-height-normal);
+}
+
+/* ===== Tabs ===== */
+
+.dual-chart-panel__tabs {
+  display: flex;
+  gap: var(--spacing-2);
+  padding: var(--spacing-1);
+  background-color: var(--bg-secondary);
+  border-radius: var(--radius-md);
+  align-self: flex-start;
+}
+
+.dual-chart-panel__tab {
+  padding: var(--spacing-2) var(--spacing-4);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--text-secondary);
+  background-color: transparent;
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+}
+
+.dual-chart-panel__tab:hover {
+  color: var(--text-primary);
+  background-color: var(--bg-hover);
+}
+
+.dual-chart-panel__tab--active {
+  color: var(--color-primary-600);
+  background-color: var(--bg-primary);
+  box-shadow: var(--shadow-xs);
+}
+
+[data-theme="dark"] .dual-chart-panel__tab--active {
+  color: var(--color-primary-400);
+}
+
+.dual-chart-panel__tab:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 2px;
+}
+
+/* ===== Content ===== */
+
+.dual-chart-panel__content {
+  min-height: 300px;
+}
+
+.dual-chart-panel__charts {
+  display: grid;
+  gap: var(--spacing-6);
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 1024px) {
+  .dual-chart-panel__charts {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.dual-chart-panel__chart-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-3);
+}
+
+.dual-chart-panel__chart-title {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
+}
+
+.dual-chart-panel__chart {
+  flex: 1;
+  min-height: 250px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ===== Loading State ===== */
+
+.dual-chart-panel__loading {
+  display: grid;
+  gap: var(--spacing-6);
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 1024px) {
+  .dual-chart-panel__loading {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.dual-chart-panel__chart-skeleton {
+  width: 100%;
+  height: 250px;
+  border-radius: var(--radius-md);
+}
+
+/* ===== Error State ===== */
+
+.dual-chart-panel__error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-3);
+  min-height: 300px;
+  text-align: center;
+}
+
+.dual-chart-panel__error-icon {
+  width: 48px;
+  height: 48px;
+  color: var(--color-error-500);
+}
+
+.dual-chart-panel__error-message {
+  font-size: var(--font-size-base);
+  color: var(--text-secondary);
+  max-width: 400px;
+}
+
+/* ===== Empty State ===== */
+
+.dual-chart-panel__empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-3);
+  min-height: 300px;
+  text-align: center;
+}
+
+.dual-chart-panel__empty-icon {
+  width: 48px;
+  height: 48px;
+  color: var(--text-tertiary);
+}
+
+.dual-chart-panel__empty-message {
+  font-size: var(--font-size-base);
+  color: var(--text-secondary);
+}
+
+/* ===== Responsive Design ===== */
+
+@media (max-width: 640px) {
+  .dual-chart-panel {
+    padding: var(--spacing-4);
+    gap: var(--spacing-4);
+  }
+
+  .dual-chart-panel__title {
+    font-size: var(--font-size-lg);
+  }
+
+  .dual-chart-panel__tabs {
+    width: 100%;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .dual-chart-panel__tabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .dual-chart-panel__chart {
+    min-height: 200px;
+  }
+}
+
+/* ===== Accessibility ===== */
+
+@media (prefers-reduced-motion: reduce) {
+  .dual-chart-panel__tab {
+    transition: none;
+  }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+  .dual-chart-panel {
+    border-width: 2px;
+  }
+
+  .dual-chart-panel__tab--active {
+    border: 2px solid currentColor;
+  }
+}
